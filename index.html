@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>2026 Conference Tournament Bracket Challenge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+:root{
+  --bg:#06090f;--sf:#0d1420;--sf2:#131d30;--sfh:#1a2844;
+  --bd:#1a2640;--bdh:#2a3d60;
+  --tx:#e4eaf4;--dm:#6b7fa0;--dmr:#3d506e;
+  --gd:#f0a820;--gdg:rgba(240,168,32,.2);
+  --gn:#22c55e;--gng:rgba(34,197,94,.12);
+  --rd:#ef4444;--rdg:rgba(239,68,68,.1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
+
+.hdr{text-align:center;padding:1.4rem 1rem .6rem;position:relative}
+.hdr::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% -20%,rgba(240,168,32,.07) 0%,transparent 65%);pointer-events:none}
+.hdr h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.6rem,4.5vw,2.8rem);letter-spacing:.1em;color:var(--gd);line-height:1.1}
+.hdr .sub{font-family:'Barlow Condensed',sans-serif;color:var(--dm);font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;margin-top:.15rem}
+
+.ban{text-align:center;padding:.45rem;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;display:none}
+.ban.rd{display:block;background:linear-gradient(90deg,transparent,var(--rdg),transparent);color:var(--rd)}
+.ban.gn{display:block;background:linear-gradient(90deg,transparent,var(--gng),transparent);color:var(--gn)}
+
+.ubar{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.5rem 1rem;flex-wrap:wrap}
+.ubar input{background:var(--sf);border:1px solid var(--bd);color:var(--tx);padding:.4rem .8rem;border-radius:5px;font-family:'Barlow',sans-serif;font-size:.88rem;width:190px;outline:none;transition:border .2s}
+.ubar input:focus{border-color:var(--gd)}
+.ubar button{background:var(--gd);color:var(--bg);border:none;padding:.4rem 1rem;border-radius:5px;font-family:'Barlow',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;transition:transform .12s,box-shadow .2s}
+.ubar button:hover{transform:translateY(-1px);box-shadow:0 4px 14px var(--gdg)}
+.st{font-size:.72rem;color:var(--dm)}.st.on{color:var(--gn)}
+
+.vbar{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.3rem 1rem;flex-wrap:wrap;display:none}
+.vbar label{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:var(--dm);text-transform:uppercase;letter-spacing:.08em}
+.vbar select{background:var(--sf);border:1px solid var(--bd);color:var(--tx);padding:.3rem .6rem;border-radius:5px;font-family:'Barlow',sans-serif;font-size:.82rem;outline:none;cursor:pointer}
+
+.tabs{display:flex;justify-content:center;gap:0;padding:0 .4rem;margin:.2rem auto;max-width:780px;border-bottom:2px solid var(--bd);flex-wrap:wrap}
+.tab{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.04em;padding:.45rem .8rem;cursor:pointer;color:var(--dm);border-bottom:3px solid transparent;transition:all .15s;user-select:none;position:relative;top:2px}
+.tab:hover{color:var(--tx)}.tab.on{color:var(--gd);border-bottom-color:var(--gd)}
+.tab.lb{color:var(--gn)}.tab.lb.on{border-bottom-color:var(--gn)}
+.tab.adm{color:var(--rd);font-size:.82rem}.tab.adm.on{border-bottom-color:var(--rd)}
+
+.skey{display:flex;justify-content:center;gap:1rem;padding:.35rem 1rem;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;color:var(--dm);flex-wrap:wrap}
+.skey b{font-family:'Bebas Neue',sans-serif;font-size:.88rem;color:var(--gd);font-weight:400}
+
+.bv{display:none;padding:.6rem}.bv.on{display:block}
+.chdr{text-align:center;padding:.6rem 0 .4rem}
+.chdr h2{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.05em}
+.chdr .m{font-family:'Barlow Condensed',sans-serif;color:var(--dm);font-size:.76rem;letter-spacing:.1em;text-transform:uppercase}
+
+.brk{display:flex;align-items:stretch;overflow-x:auto;padding:.6rem 0;gap:0;min-height:320px}
+.rnd{display:flex;flex-direction:column;justify-content:space-around;min-width:165px;gap:5px;padding:0 2px}
+.rl{font-family:'Barlow Condensed',sans-serif;text-align:center;font-size:.62rem;color:var(--dm);text-transform:uppercase;letter-spacing:.1em;padding-bottom:.25rem;margin-bottom:.15rem;border-bottom:1px solid var(--bd);white-space:nowrap}
+.rl b{color:var(--gd);font-weight:600}
+
+.mu{display:flex;flex-direction:column;gap:1px;flex:1;justify-content:center;position:relative}
+.mu::after{content:'';position:absolute;right:-2px;top:22%;bottom:22%;width:1px;background:var(--bd)}
+
+.ts{display:flex;align-items:center;gap:.3rem;padding:.28rem .45rem;background:var(--sf);border:1px solid var(--bd);border-radius:3px;cursor:pointer;transition:all .12s;min-height:28px;position:relative;overflow:hidden}
+.ts:hover:not(.emp):not(.lk){background:var(--sfh);border-color:var(--gd);transform:translateX(2px)}
+.ts.pk{border-color:var(--gn);background:linear-gradient(135deg,var(--gng),var(--sf));box-shadow:inset 3px 0 0 var(--gn)}
+.ts.ok{border-color:var(--gn);background:linear-gradient(135deg,rgba(34,197,94,.15),var(--sf));box-shadow:inset 3px 0 0 var(--gn)}
+.ts.no{border-color:var(--rd);background:linear-gradient(135deg,var(--rdg),var(--sf));box-shadow:inset 3px 0 0 var(--rd);opacity:.55}
+.ts.emp{opacity:.2;cursor:default;border-style:dashed}
+.ts.lk{cursor:default}.ts.lk:not(.pk):not(.ok):not(.no){opacity:.4}
+.sd{font-family:'Barlow Condensed',sans-serif;font-size:.58rem;color:var(--dm);min-width:14px;text-align:center;font-weight:600}
+.tn{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:600;letter-spacing:.015em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.badge{font-size:.6rem;font-weight:700;margin-left:auto;flex-shrink:0}
+.badge.w{color:var(--gn)}.badge.l{color:var(--rd)}
+
+.chcol{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:140px;padding:0 6px}
+.chcol .tr{font-size:2rem;margin-bottom:.35rem}
+.chcol .cl{font-family:'Barlow Condensed',sans-serif;font-size:.58rem;color:var(--dm);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.15rem}
+.chcol .cp{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:.04em;color:var(--gd);text-align:center;min-height:34px;display:flex;align-items:center;justify-content:center;padding:.35rem .7rem;border:2px solid var(--gd);border-radius:6px;background:rgba(240,168,32,.03);min-width:120px}
+.chcol .cp.e{color:var(--dm);border-color:var(--bd);border-style:dashed;background:0;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:400}
+.chcol .pl{font-size:.6rem;color:var(--gd);margin-top:.15rem;font-weight:600}
+
+/* ── LEADERBOARD ── */
+.lbd{max-width:680px;margin:.6rem auto;padding:0 1rem}
+.lbd h2{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;text-align:center;color:var(--gn);margin-bottom:.6rem}
+.lr{display:flex;align-items:center;padding:.55rem .7rem;background:var(--sf);border:1px solid var(--bd);border-radius:5px;margin-bottom:.3rem;gap:.5rem;transition:background .15s}
+.lr:hover{background:var(--sf2)}
+.lr.f{border-color:var(--gd);background:linear-gradient(135deg,rgba(240,168,32,.05),var(--sf))}
+.lrk{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--dm);min-width:26px;text-align:center}
+.lr.f .lrk{color:var(--gd)}
+.lnm{flex:1;font-weight:600;font-size:.9rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lsc{display:flex;flex-direction:column;align-items:flex-end;gap:.1rem;min-width:90px}
+.lsc .pts{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;color:var(--gn)}
+.lsc .max{font-family:'Barlow Condensed',sans-serif;font-size:.62rem;color:var(--dm)}
+.lcf{display:flex;gap:.25rem;font-family:'Barlow Condensed',sans-serif;font-size:.6rem;color:var(--dm);flex-wrap:wrap}
+.lcf span{background:var(--bg);padding:.1rem .28rem;border-radius:2px;white-space:nowrap}
+
+/* ── ADMIN ── */
+.adp{max-width:700px;margin:.6rem auto;padding:0 1rem}
+.adp h2{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--rd);text-align:center;margin-bottom:.4rem}
+.adp .inf{font-size:.78rem;color:var(--dm);text-align:center;margin-bottom:.8rem}
+.adc{margin-bottom:1.2rem}
+.adc h3{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--gd);margin-bottom:.3rem}
+.ag{display:flex;align-items:center;gap:.4rem;padding:.3rem 0;border-bottom:1px solid var(--bd);font-size:.78rem;flex-wrap:wrap}
+.ag .rd{color:var(--dm);font-family:'Barlow Condensed',sans-serif;min-width:75px;font-size:.68rem}
+.ag button{background:var(--sf);border:1px solid var(--bd);color:var(--tx);padding:.2rem .5rem;border-radius:3px;cursor:pointer;font-size:.72rem;font-family:'Barlow Condensed',sans-serif;transition:all .12s}
+.ag button:hover{border-color:var(--gd)}
+.ag button.s{background:var(--gn);color:var(--bg);border-color:var(--gn);font-weight:700}
+.ag button.x{background:var(--rd);color:#fff;border-color:var(--rd);padding:.2rem .35rem}
+.ag .wt{color:var(--dmr);font-size:.68rem;font-style:italic}
+
+.nmsg{text-align:center;padding:2rem 1rem;color:var(--dm);font-size:.95rem}
+.nmsg strong{color:var(--gd)}
+
+@media(max-width:768px){.rnd{min-width:130px}.tn{font-size:.68rem}.tab{font-size:.88rem;padding:.4rem .55rem}.lcf{display:none}}
+::-webkit-scrollbar{height:4px;width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
+  </style>
+</head>
+<body>
+<div class="hdr"><h1>2026 Bracket Challenge</h1><div class="sub">ACC &bull; Big 12 &bull; Big Ten &bull; Big East &bull; SEC</div></div>
+<div class="ban" id="ban"></div>
+<div class="ubar">
+  <input type="text" id="ni" placeholder="Enter your name..." maxlength="24"/>
+  <button onclick="join()">Join / Load</button>
+  <span class="st" id="st"></span>
+</div>
+<div style="text-align:center;padding:0 1rem .3rem;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;color:var(--dm);letter-spacing:.06em;font-style:italic;">Please don't be a faggot and only pick favorites</div>
+<div class="vbar" id="vbar">
+  <label>Viewing:</label>
+  <select id="vsel" onchange="swV()"></select>
+</div>
+<div class="skey" id="sk" style="display:none">
+  <span>R1: <b>1</b></span><span>R2: <b>2</b></span><span>QF: <b>4</b></span><span>SF: <b>8</b></span><span>Final: <b>16</b></span><span style="color:var(--dm);font-size:.65rem">(Big East R1 = 2)</span>
+</div>
+<div class="tabs" id="tb" style="display:none"></div>
+<div id="ct"><div class="nmsg">Enter your name and click <strong>Join / Load</strong> to start picking!</div></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+// ── ADMIN ACCESS ──
+// Add ?admin=brackets2026 to the URL to see the Admin tab
+// Change this password to whatever you want
+const ADMIN_PW = "brackets2026";
+const isAdmin = new URLSearchParams(window.location.search).get("admin") === ADMIN_PW;
+
+// ── LOCK TIMES (Central Time = UTC-6 in March before DST, but DST starts Mar 8 2026 so CT = UTC-5) ──
+// DST 2026 starts Sun March 8, so by March 10 we are CDT = UTC-5
+const LK={
+  acc:    new Date("2026-03-10T13:00:00-06:00"), // 1:00 PM CT
+  big12:  new Date("2026-03-10T11:30:00-06:00"), // 11:30 AM CT
+  bigten: new Date("2026-03-10T16:00:00-06:00"), // 4:00 PM CT (first game 4pm CT)
+  bigeast:new Date("2026-03-11T15:00:00-06:00"), // 3:00 PM CT
+  sec:    new Date("2026-03-11T11:30:00-06:00"), // 11:30 AM CT
+};
+const lkd=ck=>Date.now()>=LK[ck].getTime();
+const anyLkd=()=>Object.keys(LK).some(lkd);
+
+// ── CONFERENCES ──
+const D={
+acc:{nm:"ACC Tournament",dt:"March 10\u201314",lc:"Charlotte, NC",rs:[
+{n:"First Round",d:"Tue 3/10",p:1,g:[
+{id:"acc_r1_1",s:[10,15],t:["Stanford","Pitt"]},{id:"acc_r1_2",s:[11,14],t:["SMU","Syracuse"]},{id:"acc_r1_3",s:[12,13],t:["Virginia Tech","Wake Forest"]}]},
+{n:"Second Round",d:"Wed 3/11",p:2,g:[
+{id:"acc_r2_1",s:[7,null],t:["NC State",null],f:[null,"acc_r1_1"]},{id:"acc_r2_2",s:[6,null],t:["Louisville",null],f:[null,"acc_r1_2"]},{id:"acc_r2_3",s:[8,9],t:["Florida State","Cal"]},{id:"acc_r2_4",s:[5,null],t:["Clemson",null],f:[null,"acc_r1_3"]}]},
+{n:"Quarterfinals",d:"Thu 3/12",p:4,g:[
+{id:"acc_qf_1",s:[2,null],t:["Virginia",null],f:[null,"acc_r2_1"]},{id:"acc_qf_2",s:[3,null],t:["Miami",null],f:[null,"acc_r2_2"]},{id:"acc_qf_3",s:[1,null],t:["Duke",null],f:[null,"acc_r2_3"]},{id:"acc_qf_4",s:[4,null],t:["North Carolina",null],f:[null,"acc_r2_4"]}]},
+{n:"Semifinals",d:"Fri 3/13",p:8,g:[
+{id:"acc_sf_1",s:[null,null],t:[null,null],f:["acc_qf_1","acc_qf_2"]},{id:"acc_sf_2",s:[null,null],t:[null,null],f:["acc_qf_3","acc_qf_4"]}]},
+{n:"Final",d:"Sat 3/14",p:16,g:[{id:"acc_fin",s:[null,null],t:[null,null],f:["acc_sf_1","acc_sf_2"]}]}
+]},
+big12:{nm:"Big 12 Tournament",dt:"March 10\u201314",lc:"Kansas City, MO",rs:[
+{n:"First Round",d:"Tue 3/10",p:1,g:[
+{id:"b12_r1_1",s:[12,13],t:["Arizona State","Baylor"]},{id:"b12_r1_2",s:[9,16],t:["Cincinnati","Utah"]},{id:"b12_r1_3",s:[10,15],t:["BYU","Kansas State"]},{id:"b12_r1_4",s:[11,14],t:["Colorado","Oklahoma State"]}]},
+{n:"Second Round",d:"Wed 3/11",p:2,g:[
+{id:"b12_r2_1",s:[5,null],t:["Iowa State",null],f:[null,"b12_r1_1"]},{id:"b12_r2_2",s:[8,null],t:["UCF",null],f:[null,"b12_r1_2"]},{id:"b12_r2_3",s:[7,null],t:["West Virginia",null],f:[null,"b12_r1_3"]},{id:"b12_r2_4",s:[6,null],t:["TCU",null],f:[null,"b12_r1_4"]}]},
+{n:"Quarterfinals",d:"Thu 3/12",p:4,g:[
+{id:"b12_qf_1",s:[4,null],t:["Texas Tech",null],f:[null,"b12_r2_1"]},{id:"b12_qf_2",s:[1,null],t:["Arizona",null],f:[null,"b12_r2_2"]},{id:"b12_qf_3",s:[2,null],t:["Houston",null],f:[null,"b12_r2_3"]},{id:"b12_qf_4",s:[3,null],t:["Kansas",null],f:[null,"b12_r2_4"]}]},
+{n:"Semifinals",d:"Fri 3/13",p:8,g:[
+{id:"b12_sf_1",s:[null,null],t:[null,null],f:["b12_qf_1","b12_qf_2"]},{id:"b12_sf_2",s:[null,null],t:[null,null],f:["b12_qf_3","b12_qf_4"]}]},
+{n:"Final",d:"Sat 3/14",p:16,g:[{id:"b12_fin",s:[null,null],t:[null,null],f:["b12_sf_1","b12_sf_2"]}]}
+]},
+bigten:{nm:"Big Ten Tournament",dt:"March 10\u201315",lc:"Chicago, IL",rs:[
+{n:"First Round",d:"Tue 3/10",p:1,g:[
+{id:"bt_r1_1",s:[16,17],t:["Oregon","Maryland"]},{id:"bt_r1_2",s:[15,18],t:["Northwestern","Penn State"]}]},
+{n:"Second Round",d:"Wed 3/11",p:1,g:[
+{id:"bt_r2_1",s:[9,null],t:["Iowa",null],f:[null,"bt_r1_1"]},{id:"bt_r2_2",s:[12,13],t:["Washington","USC"]},{id:"bt_r2_3",s:[10,null],t:["Indiana",null],f:[null,"bt_r1_2"]},{id:"bt_r2_4",s:[11,14],t:["Minnesota","Rutgers"]}]},
+{n:"Third Round",d:"Thu 3/12",p:2,g:[
+{id:"bt_r3_1",s:[8,null],t:["Ohio State",null],f:[null,"bt_r2_1"]},{id:"bt_r3_2",s:[5,null],t:["Wisconsin",null],f:[null,"bt_r2_2"]},{id:"bt_r3_3",s:[7,null],t:["Purdue",null],f:[null,"bt_r2_3"]},{id:"bt_r3_4",s:[6,null],t:["UCLA",null],f:[null,"bt_r2_4"]}]},
+{n:"Quarterfinals",d:"Fri 3/13",p:4,g:[
+{id:"bt_qf_1",s:[1,null],t:["Michigan",null],f:[null,"bt_r3_1"]},{id:"bt_qf_2",s:[4,null],t:["Illinois",null],f:[null,"bt_r3_2"]},{id:"bt_qf_3",s:[2,null],t:["Nebraska",null],f:[null,"bt_r3_3"]},{id:"bt_qf_4",s:[3,null],t:["Michigan State",null],f:[null,"bt_r3_4"]}]},
+{n:"Semifinals",d:"Sat 3/14",p:8,g:[
+{id:"bt_sf_1",s:[null,null],t:[null,null],f:["bt_qf_1","bt_qf_2"]},{id:"bt_sf_2",s:[null,null],t:[null,null],f:["bt_qf_3","bt_qf_4"]}]},
+{n:"Final",d:"Sun 3/15",p:16,g:[{id:"bt_fin",s:[null,null],t:[null,null],f:["bt_sf_1","bt_sf_2"]}]}
+]},
+bigeast:{nm:"Big East Tournament",dt:"March 11\u201314",lc:"New York, NY (MSG)",rs:[
+{n:"First Round",d:"Wed 3/11",p:2,g:[
+{id:"be_r1_1",s:[8,9],t:["Butler","Providence"]},{id:"be_r1_2",s:[7,10],t:["Marquette","Xavier"]},{id:"be_r1_3",s:[6,11],t:["DePaul","Georgetown"]}]},
+{n:"Quarterfinals",d:"Thu 3/12",p:4,g:[
+{id:"be_qf_1",s:[1,null],t:["St. John's",null],f:[null,"be_r1_1"]},{id:"be_qf_2",s:[5,4],t:["Creighton","Seton Hall"]},{id:"be_qf_3",s:[2,null],t:["UConn",null],f:[null,"be_r1_2"]},{id:"be_qf_4",s:[3,null],t:["Villanova",null],f:[null,"be_r1_3"]}]},
+{n:"Semifinals",d:"Fri 3/13",p:8,g:[
+{id:"be_sf_1",s:[null,null],t:[null,null],f:["be_qf_1","be_qf_2"]},{id:"be_sf_2",s:[null,null],t:[null,null],f:["be_qf_3","be_qf_4"]}]},
+{n:"Final",d:"Sat 3/14",p:16,g:[{id:"be_fin",s:[null,null],t:[null,null],f:["be_sf_1","be_sf_2"]}]}
+]},
+sec:{nm:"SEC Tournament",dt:"March 11\u201315",lc:"Nashville, TN",rs:[
+{n:"First Round",d:"Wed 3/11",p:1,g:[
+{id:"sec_r1_1",s:[9,16],t:["Kentucky","LSU"]},{id:"sec_r1_2",s:[12,13],t:["Auburn","Mississippi St"]},{id:"sec_r1_3",s:[10,15],t:["Texas","Ole Miss"]},{id:"sec_r1_4",s:[11,14],t:["Oklahoma","South Carolina"]}]},
+{n:"Second Round",d:"Thu 3/12",p:2,g:[
+{id:"sec_r2_1",s:[8,null],t:["Missouri",null],f:[null,"sec_r1_1"]},{id:"sec_r2_2",s:[5,null],t:["Tennessee",null],f:[null,"sec_r1_2"]},{id:"sec_r2_3",s:[7,null],t:["Georgia",null],f:[null,"sec_r1_3"]},{id:"sec_r2_4",s:[6,null],t:["Texas A&M",null],f:[null,"sec_r1_4"]}]},
+{n:"Quarterfinals",d:"Fri 3/13",p:4,g:[
+{id:"sec_qf_1",s:[1,null],t:["Florida",null],f:[null,"sec_r2_1"]},{id:"sec_qf_2",s:[4,null],t:["Vanderbilt",null],f:[null,"sec_r2_2"]},{id:"sec_qf_3",s:[2,null],t:["Alabama",null],f:[null,"sec_r2_3"]},{id:"sec_qf_4",s:[3,null],t:["Arkansas",null],f:[null,"sec_r2_4"]}]},
+{n:"Semifinals",d:"Sat 3/14",p:8,g:[
+{id:"sec_sf_1",s:[null,null],t:[null,null],f:["sec_qf_1","sec_qf_2"]},{id:"sec_sf_2",s:[null,null],t:[null,null],f:["sec_qf_3","sec_qf_4"]}]},
+{n:"Final",d:"Sun 3/15",p:16,g:[{id:"sec_fin",s:[null,null],t:[null,null],f:["sec_sf_1","sec_sf_2"]}]}
+]}
+};
+
+const G={};for(const[ck,cv] of Object.entries(D))for(const r of cv.rs)for(const g of r.g)G[g.id]={...g,ck,p:r.p};
+
+// ── STATE ──
+let me=null,tab="acc",picks={},users={},res={},db=null,viewing=null;
+
+// ── FIREBASE ──
+firebase.initializeApp({
+  apiKey:"AIzaSyCg_HF3_Qf3cL-Tq9R4s7CBK6A-cRBJqr8",
+  authDomain:"conferencetournaments-7c427.firebaseapp.com",
+  databaseURL:"https://conferencetournaments-7c427-default-rtdb.firebaseio.com",
+  projectId:"conferencetournaments-7c427",
+  storageBucket:"conferencetournaments-7c427.firebasestorage.app",
+  messagingSenderId:"563357801312",
+  appId:"1:563357801312:web:14cabdf2ff50cd93c51c05"
+});
+db=firebase.database();
+db.ref("users").on("value",s=>{users=s.val()||{};updVD();if(tab==="standings")render();});
+db.ref("results").on("value",s=>{res=s.val()||{};render();});
+
+// ── BUILD TABS ──
+function buildTabs(){
+  const tb=document.getElementById("tb");
+  let h=`<div class="tab on" data-t="acc" onclick="stab('acc')">ACC</div>
+<div class="tab" data-t="big12" onclick="stab('big12')">Big 12</div>
+<div class="tab" data-t="bigten" onclick="stab('bigten')">Big Ten</div>
+<div class="tab" data-t="bigeast" onclick="stab('bigeast')">Big East</div>
+<div class="tab" data-t="sec" onclick="stab('sec')">SEC</div>
+<div class="tab lb" data-t="standings" onclick="stab('standings')">Standings</div>`;
+  if(isAdmin) h+=`<div class="tab adm" data-t="admin" onclick="stab('admin')">Admin</div>`;
+  tb.innerHTML=h;
+}
+buildTabs();
+
+// ── JOIN ──
+function join(){
+  const raw=document.getElementById("ni").value.trim();
+  if(!raw)return;
+  me=raw.toLowerCase().replace(/[^a-z0-9]/g,"_");
+  db.ref(`users/${me}/picks`).once("value",s=>{
+    picks=s.val()||{};
+    viewing=me;
+    document.getElementById("st").textContent=`Playing as ${raw}`;
+    document.getElementById("st").className="st on";
+    document.getElementById("tb").style.display="flex";
+    document.getElementById("sk").style.display="flex";
+    updBan();updVD();render();
+  });
+}
+
+function save(){
+  if(!me)return;
+  db.ref(`users/${me}`).set({picks,name:document.getElementById("ni").value.trim(),ts:Date.now()});
+}
+
+// ── VIEWER DROPDOWN ──
+function updVD(){
+  const vb=document.getElementById("vbar"),sl=document.getElementById("vsel");
+  if(!me||!anyLkd()){vb.style.display="none";return;}
+  vb.style.display="flex";
+  const prev=sl.value||viewing||me;
+  sl.innerHTML="";
+  const mo=document.createElement("option");mo.value=me;mo.textContent=`My Bracket`;sl.appendChild(mo);
+  for(const[uid,d] of Object.entries(users)){
+    if(uid===me)continue;
+    const o=document.createElement("option");o.value=uid;o.textContent=d.name||uid;sl.appendChild(o);
+  }
+  sl.value=prev;
+}
+function swV(){viewing=document.getElementById("vsel").value;render();}
+function gvp(){
+  if(!viewing||viewing===me)return picks;
+  return(users[viewing]&&users[viewing].picks)||{};
+}
+
+// ── BANNER ──
+function updBan(){
+  const b=document.getElementById("ban");
+  const allL=Object.keys(LK).every(lkd),anyL=Object.keys(LK).some(lkd);
+  if(allL){b.className="ban rd";b.textContent="\uD83D\uDD12 All brackets locked \u2014 picks are final";}
+  else if(anyL){
+    const open=Object.keys(LK).filter(k=>!lkd(k));
+    b.className="ban rd";b.textContent=`\uD83D\uDD12 Some locked \u2014 ${open.map(k=>k.toUpperCase()).join(", ")} still open`;
+  }else{
+    const d=new Date(Math.min(...Object.values(LK).map(x=>x.getTime())));
+    b.className="ban gn";
+    // Format in Central Time
+    b.textContent=`\uD83D\uDFE2 Picks lock at first tip \u2014 ${d.toLocaleDateString('en-US',{timeZone:'America/Chicago',weekday:'short',month:'short',day:'numeric'})} ${d.toLocaleTimeString('en-US',{timeZone:'America/Chicago',hour:'numeric',minute:'2-digit'})} CT`;
+  }
+}
+
+// ── TABS ──
+function stab(t){tab=t;document.querySelectorAll(".tab").forEach(e=>e.classList.toggle("on",e.dataset.t===t));render();}
+function render(){
+  if(!me&&tab!=="standings"){document.getElementById("ct").innerHTML=`<div class="nmsg">Enter your name and click <strong>Join / Load</strong></div>`;return;}
+  if(tab==="standings")rStand();
+  else if(tab==="admin"&&isAdmin)rAdmin();
+  else if(tab==="admin")document.getElementById("ct").innerHTML=`<div class="nmsg">Access denied</div>`;
+  else rBrk(tab);
+}
+
+// ── RESOLVE ──
+function rv(g,i,pk){
+  if(g.t[i])return{nm:g.t[i],sd:g.s[i]};
+  if(!g.f||!g.f[i])return null;
+  const p=pk[g.f[i]];if(p==null)return null;
+  return rv(G[g.f[i]],p,pk);
+}
+function ra(g,i){
+  if(g.t[i])return{nm:g.t[i],sd:g.s[i]};
+  if(!g.f||!g.f[i])return null;
+  const r=res[g.f[i]];if(r==null)return null;
+  return ra(G[g.f[i]],r);
+}
+
+// ── PICK ──
+function mp(gid,i){
+  if(!me||viewing!==me)return;
+  const g=G[gid];if(!g||lkd(g.ck))return;
+  const t0=rv(g,0,picks),t1=rv(g,1,picks);
+  if(!t0||!t1||picks[gid]===i)return;
+  if(picks[gid]!=null)cd(gid);
+  picks[gid]=i;save();rBrk(tab);
+}
+function cd(gid){for(const g of Object.values(G)){if(g.f&&(g.f[0]===gid||g.f[1]===gid)&&picks[g.id]!=null){delete picks[g.id];cd(g.id);}}}
+
+// ── RENDER BRACKET ──
+function rBrk(ck){
+  const c=D[ck];if(!c)return;
+  const lk=lkd(ck);
+  const vp=gvp();const isMe=viewing===me;
+  const vn=viewing&&users[viewing]?users[viewing].name:null;
+
+  let h=`<div class="bv on"><div class="chdr"><h2>${c.nm}</h2><div class="m">${c.dt} \u2022 ${c.lc}`;
+  if(lk)h+=` \u2022 \uD83D\uDD12 LOCKED`;
+  if(!isMe&&vn)h+=` \u2022 Viewing: ${vn}`;
+  h+=`</div></div><div class="brk">`;
+
+  c.rs.forEach(r=>{
+    h+=`<div class="rnd"><div class="rl">${r.n}<br><b>${r.p}pt${r.p>1?'s':''}</b></div>`;
+    r.g.forEach(g=>{
+      const t0=rv(g,0,vp),t1=rv(g,1,vp),pk=vp[g.id],rr=res[g.id],rdy=t0&&t1;
+      h+=`<div class="mu">${sl(g.id,0,t0,pk,rdy,lk||!isMe,rr)}${sl(g.id,1,t1,pk,rdy,lk||!isMe,rr)}</div>`;
+    });
+    h+=`</div>`;
+  });
+
+  const fid=c.rs[c.rs.length-1].g[0].id,fp=vp[fid];
+  let ch=fp!=null?rv(c.rs[c.rs.length-1].g[0],fp,vp):null;
+  h+=`<div class="chcol"><div class="tr">\uD83C\uDFC6</div><div class="cl">Champion</div><div class="cp ${ch?'':'e'}">${ch?ch.nm:'TBD'}</div><div class="pl">16 PTS</div></div>`;
+  h+=`</div></div>`;
+  document.getElementById("ct").innerHTML=h;
+}
+
+function sl(gid,i,tm,pk,rdy,lk,rr){
+  const emp=!tm,isPk=pk===i,hasR=rr!=null;
+  let cls="ts";
+  if(emp)cls+=" emp";
+  if(lk||!rdy)cls+=" lk";
+  if(isPk&&hasR)cls+=rr===i?" ok":" no";
+  else if(isPk)cls+=" pk";
+  const oc=(!emp&&rdy&&!lk)?` onclick="mp('${gid}',${i})"`:""
+  let badge="";
+  if(isPk&&hasR)badge=rr===i?`<span class="badge w">\u2713</span>`:`<span class="badge l">\u2717</span>`;
+  return`<div class="${cls}"${oc}><span class="sd">${tm&&tm.sd?tm.sd:""}</span><span class="tn">${tm?tm.nm:"TBD"}</span>${badge}</div>`;
+}
+
+// ── MAX POSSIBLE POINTS ──
+// A pick is "still alive" if: the game has no result yet AND the picked team
+// hasn't been eliminated by an earlier result in the actual bracket.
+function calcMax(pk){
+  let tot=0;const bc={};
+  for(const[ck,cv] of Object.entries(D)){
+    let ct=0;
+    for(const r of cv.rs)for(const g of r.g){
+      const p=pk[g.id];
+      if(p==null)continue; // no pick made
+      const rr=res[g.id];
+
+      if(rr!=null){
+        // Game decided — award if correct
+        const picked=rv(g,p,pk),actual=ra(g,rr);
+        if(picked&&actual&&picked.nm===actual.nm)ct+=r.p;
+      }else{
+        // Game not decided yet — check if the picked team is still alive
+        // The picked team is alive if it hasn't been eliminated in any
+        // earlier game in the actual results chain
+        const pickedTeam=rv(g,p,pk);
+        if(pickedTeam&&isStillAlive(pickedTeam.nm,g))ct+=r.p;
+      }
+    }
+    bc[ck]=ct;tot+=ct;
+  }
+  return{tot,bc};
+}
+
+function isStillAlive(teamName, targetGame){
+  // Walk the feeder chain for this game. For each feeder that has an actual
+  // result, check if the team was in that game and lost.
+  // We trace backwards: does the team need to have won a game that it actually lost?
+  return checkAlive(teamName, targetGame);
+}
+
+function checkAlive(tn, g){
+  // For each slot in this game, check if this team needs to come through a feeder
+  for(let i=0;i<2;i++){
+    if(g.t[i]===tn) return true; // static slot, always alive
+    if(g.f&&g.f[i]){
+      const fg=G[g.f[i]];
+      const rr=res[fg.id];
+      if(rr!=null){
+        // Feeder decided — did our team win this feeder?
+        const winner=ra(fg,rr);
+        if(winner&&winner.nm===tn) return true;
+        // Check if the team was even in this feeder game
+        const t0=ra(fg,0)||(fg.t[0]?{nm:fg.t[0]}:null);
+        const t1=ra(fg,1)||(fg.t[1]?{nm:fg.t[1]}:null);
+        const wasInGame=(t0&&t0.nm===tn)||(t1&&t1.nm===tn);
+        if(wasInGame&&winner&&winner.nm!==tn) return false; // eliminated here
+      } else {
+        // Feeder not decided — team could still get here, check deeper
+        if(checkAlive(tn,fg)) return true;
+      }
+    }
+  }
+  return false;
+}
+
+// ── CURRENT SCORE (earned) ──
+function calcEarned(pk){
+  let tot=0;const bc={};
+  for(const[ck,cv] of Object.entries(D)){let ct=0;
+    for(const r of cv.rs)for(const g of r.g){
+      const p=pk[g.id],rr=res[g.id];
+      if(p==null||rr==null)continue;
+      const picked=rv(g,p,pk),actual=ra(g,rr);
+      if(picked&&actual&&picked.nm===actual.nm)ct+=r.p;
+    }bc[ck]=ct;tot+=ct;
+  }return{tot,bc};
+}
+
+// ── STANDINGS ──
+function rStand(){
+  let ents=[];
+  const src=Object.keys(users).length?users:(me?{[me]:{picks,name:document.getElementById("ni").value.trim()}}:{});
+  for(const[uid,d] of Object.entries(src)){
+    const pk=d.picks||{};
+    const earned=calcEarned(pk);
+    const max=calcMax(pk);
+    ents.push({nm:d.name||uid,pts:earned.tot,bc:earned.bc,mx:max.tot,mbc:max.bc});
+  }
+  ents.sort((a,b)=>b.pts-a.pts||b.mx-a.mx||a.nm.localeCompare(b.nm));
+
+  let h=`<div class="bv on"><div class="lbd"><h2>\uD83C\uDFC6 Standings</h2>`;
+  if(!ents.length)h+=`<div class="nmsg">No participants yet!</div>`;
+  else ents.forEach((e,i)=>{
+    h+=`<div class="lr ${i===0?'f':''}">
+      <div class="lrk">${i+1}</div>
+      <div class="lnm">${e.nm}</div>
+      <div class="lcf">
+        <span>ACC ${e.bc.acc||0}</span><span>B12 ${e.bc.big12||0}</span><span>B10 ${e.bc.bigten||0}</span><span>BE ${e.bc.bigeast||0}</span><span>SEC ${e.bc.sec||0}</span>
+      </div>
+      <div class="lsc">
+        <div class="pts">${e.pts}</div>
+        <div class="max">max ${e.mx}</div>
+      </div>
+    </div>`;
+  });
+  h+=`</div></div>`;document.getElementById("ct").innerHTML=h;
+}
+
+// ── ADMIN ──
+function rAdmin(){
+  let h=`<div class="bv on"><div class="adp"><h2>\uD83D\uDD27 Admin \u2014 Enter Results</h2><div class="inf">Click the winning team as games finish. Grades all brackets instantly.</div>`;
+  for(const[ck,cv] of Object.entries(D)){
+    h+=`<div class="adc"><h3>${cv.nm}</h3>`;
+    for(const r of cv.rs)for(const g of r.g){
+      const t0=ra(g,0)||(g.t[0]?{nm:g.t[0],sd:g.s[0]}:null);
+      const t1=ra(g,1)||(g.t[1]?{nm:g.t[1],sd:g.s[1]}:null);
+      const rr=res[g.id],rdy=t0&&t1;
+      h+=`<div class="ag"><span class="rd">${r.n} \u2022 ${r.p}pt</span>`;
+      if(rdy){
+        h+=`<button class="${rr===0?'s':''}" onclick="sr('${g.id}',0)">(${t0.sd}) ${t0.nm}</button>`;
+        h+=`<button class="${rr===1?'s':''}" onclick="sr('${g.id}',1)">(${t1.sd}) ${t1.nm}</button>`;
+        if(rr!=null)h+=`<button class="x" onclick="cr('${g.id}')">\u2717</button>`;
+      }else h+=`<span class="wt">Waiting...</span>`;
+      h+=`</div>`;
+    }h+=`</div>`;
+  }h+=`</div></div>`;document.getElementById("ct").innerHTML=h;
+}
+
+function sr(gid,w){db.ref(`results/${gid}`).set(w);}
+function cr(gid){
+  const up={};up[gid]=null;
+  (function clrD(id){for(const g of Object.values(G)){if(g.f&&(g.f[0]===id||g.f[1]===id)&&res[g.id]!=null){up[g.id]=null;clrD(g.id);}}})(gid);
+  db.ref("results").update(up);
+}
+
+// ── INIT ──
+document.getElementById("ni").addEventListener("keydown",e=>{if(e.key==="Enter")join();});
+setInterval(updBan,60000);
+</script>
+</body>
+</html>
