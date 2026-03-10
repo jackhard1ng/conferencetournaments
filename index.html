@@ -151,11 +151,11 @@ const isAdmin = new URLSearchParams(window.location.search).get("admin") === ADM
 // ── LOCK TIMES (Central Time = UTC-6 in March before DST, but DST starts Mar 8 2026 so CT = UTC-5) ──
 // DST 2026 starts Sun March 8, so by March 10 we are CDT = UTC-5
 const LK={
-  acc:    new Date("2026-03-10T13:00:00-06:00"), // 1:00 PM CT
-  big12:  new Date("2026-03-10T11:30:00-06:00"), // 11:30 AM CT
-  bigten: new Date("2026-03-10T16:00:00-06:00"), // 4:00 PM CT (first game 4pm CT)
-  bigeast:new Date("2026-03-11T15:00:00-06:00"), // 3:00 PM CT
-  sec:    new Date("2026-03-11T11:30:00-06:00"), // 11:30 AM CT
+  acc:    new Date("2026-03-10T13:00:00-05:00"), // 1:00 PM CT
+  big12:  new Date("2026-03-10T11:30:00-05:00"), // 11:30 AM CT
+  bigten: new Date("2026-03-10T16:00:00-05:00"), // 4:00 PM CT (first game 4pm CT)
+  bigeast:new Date("2026-03-11T15:00:00-05:00"), // 3:00 PM CT
+  sec:    new Date("2026-03-11T11:30:00-05:00"), // 11:30 AM CT
 };
 const lkd=ck=>Date.now()>=LK[ck].getTime();
 const anyLkd=()=>Object.keys(LK).some(lkd);
