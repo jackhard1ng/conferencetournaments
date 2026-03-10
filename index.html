@@ -128,7 +128,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--tx);min-he
   <button onclick="join()">Join / Load</button>
   <span class="st" id="st"></span>
 </div>
-<div style="text-align:center;padding:0 1rem .3rem;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;color:var(--dm);letter-spacing:.06em;font-style:italic;">Shoutout to Isaac for only picking #1 seeds</div>
+<div style="text-align:center;padding:0 1rem .3rem;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;color:var(--dm);letter-spacing:.06em;font-style:italic;">Shoutout to Sac for picking all 1 seeds!</div>
 <div class="vbar" id="vbar">
   <label>Viewing:</label>
   <select id="vsel" onchange="swV()"></select>
@@ -385,14 +385,14 @@ function sl(gid,i,tm,pk,rdy,lk,rr){
   // Pick count — only show after conference is locked
   let pcnt="";
   const g=G[gid];
-  if(g&&lkd(g.ck)&&!emp){
-    const counts=getPickCounts(gid);
+  if(g&&lkd(g.ck)&&!emp&&tm){
+    const counts=getPickCounts(gid,tm.nm);
     if(counts.total>0){
       if(hasR){
         const cls2=rr===i?"correct":"wrong";
-        pcnt=`<span class="pcnt ${cls2}">${counts[i]}/${counts.total}</span>`;
+        pcnt=`<span class="pcnt ${cls2}">${counts.picked}/${counts.total}</span>`;
       }else{
-        pcnt=`<span class="pcnt">${counts[i]}/${counts.total}</span>`;
+        pcnt=`<span class="pcnt">${counts.picked}/${counts.total}</span>`;
       }
     }
   }
@@ -400,15 +400,21 @@ function sl(gid,i,tm,pk,rdy,lk,rr){
 }
 
 // ── PICK COUNTS ──
-function getPickCounts(gid){
-  let c0=0,c1=0,total=0;
+// Counts how many users picked this specific TEAM to win this specific game
+function getPickCounts(gid,teamName){
+  let picked=0,total=0;
   const src=Object.keys(users).length?users:{};
   for(const[uid,d] of Object.entries(src)){
     const pk=d.picks||{};
-    if(pk[gid]===0){c0++;total++;}
-    else if(pk[gid]===1){c1++;total++;}
+    const p=pk[gid];
+    if(p==null)continue;
+    total++;
+    // Resolve which team this user actually picked for this game
+    const g=G[gid];
+    const pickedTm=rv(g,p,pk);
+    if(pickedTm&&pickedTm.nm===teamName)picked++;
   }
-  return{0:c0,1:c1,total};
+  return{picked,total};
 }
 
 // ── MAX POSSIBLE POINTS ──
