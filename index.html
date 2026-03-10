@@ -6,6 +6,9 @@
   <title>2026 Conference Tournament Bracket Challenge</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-283612F8EV"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-283612F8EV');</script>
   <style>
 :root{
   --bg:#06090f;--sf:#0d1420;--sf2:#131d30;--sfh:#1a2844;
@@ -71,6 +74,8 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--tx);min-he
 .tn{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:600;letter-spacing:.015em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
 .badge{font-size:.6rem;font-weight:700;margin-left:auto;flex-shrink:0}
 .badge.w{color:var(--gn)}.badge.l{color:var(--rd)}
+.pcnt{font-family:'Barlow Condensed',sans-serif;font-size:.55rem;color:var(--dm);margin-left:auto;flex-shrink:0;white-space:nowrap;opacity:.8}
+.pcnt.correct{color:var(--gn)}.pcnt.wrong{color:var(--rd)}
 
 .chcol{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:140px;padding:0 6px}
 .chcol .tr{font-size:2rem;margin-bottom:.35rem}
@@ -123,7 +128,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--tx);min-he
   <button onclick="join()">Join / Load</button>
   <span class="st" id="st"></span>
 </div>
-<div style="text-align:center;padding:0 1rem .3rem;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;color:var(--dm);letter-spacing:.06em;font-style:italic;">Please don't be a faggot and only pick favorites</div>
+<div style="text-align:center;padding:0 1rem .3rem;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;color:var(--dm);letter-spacing:.06em;font-style:italic;">Shoutout to Isaac for only picking #1 seeds</div>
 <div class="vbar" id="vbar">
   <label>Viewing:</label>
   <select id="vsel" onchange="swV()"></select>
@@ -146,11 +151,11 @@ const isAdmin = new URLSearchParams(window.location.search).get("admin") === ADM
 // ── LOCK TIMES (Central Time = UTC-6 in March before DST, but DST starts Mar 8 2026 so CT = UTC-5) ──
 // DST 2026 starts Sun March 8, so by March 10 we are CDT = UTC-5
 const LK={
-  acc:    new Date("2026-03-10T13:00:00-05:00"), // 1:00 PM CT
-  big12:  new Date("2026-03-10T11:30:00-05:00"), // 11:30 AM CT
-  bigten: new Date("2026-03-10T16:00:00-05:00"), // 4:00 PM CT (first game 4pm CT)
-  bigeast:new Date("2026-03-11T15:00:00-05:00"), // 3:00 PM CT
-  sec:    new Date("2026-03-11T11:30:00-05:00"), // 11:30 AM CT
+  acc:    new Date("2026-03-10T13:00:00-06:00"), // 1:00 PM CT
+  big12:  new Date("2026-03-10T11:30:00-06:00"), // 11:30 AM CT
+  bigten: new Date("2026-03-10T16:00:00-06:00"), // 4:00 PM CT (first game 4pm CT)
+  bigeast:new Date("2026-03-11T15:00:00-06:00"), // 3:00 PM CT
+  sec:    new Date("2026-03-11T11:30:00-06:00"), // 11:30 AM CT
 };
 const lkd=ck=>Date.now()>=LK[ck].getTime();
 const anyLkd=()=>Object.keys(LK).some(lkd);
@@ -377,7 +382,33 @@ function sl(gid,i,tm,pk,rdy,lk,rr){
   const oc=(!emp&&rdy&&!lk)?` onclick="mp('${gid}',${i})"`:""
   let badge="";
   if(isPk&&hasR)badge=rr===i?`<span class="badge w">\u2713</span>`:`<span class="badge l">\u2717</span>`;
-  return`<div class="${cls}"${oc}><span class="sd">${tm&&tm.sd?tm.sd:""}</span><span class="tn">${tm?tm.nm:"TBD"}</span>${badge}</div>`;
+  // Pick count — only show after conference is locked
+  let pcnt="";
+  const g=G[gid];
+  if(g&&lkd(g.ck)&&!emp){
+    const counts=getPickCounts(gid);
+    if(counts.total>0){
+      if(hasR){
+        const cls2=rr===i?"correct":"wrong";
+        pcnt=`<span class="pcnt ${cls2}">${counts[i]}/${counts.total}</span>`;
+      }else{
+        pcnt=`<span class="pcnt">${counts[i]}/${counts.total}</span>`;
+      }
+    }
+  }
+  return`<div class="${cls}"${oc}><span class="sd">${tm&&tm.sd?tm.sd:""}</span><span class="tn">${tm?tm.nm:"TBD"}</span>${pcnt}${badge}</div>`;
+}
+
+// ── PICK COUNTS ──
+function getPickCounts(gid){
+  let c0=0,c1=0,total=0;
+  const src=Object.keys(users).length?users:{};
+  for(const[uid,d] of Object.entries(src)){
+    const pk=d.picks||{};
+    if(pk[gid]===0){c0++;total++;}
+    else if(pk[gid]===1){c1++;total++;}
+  }
+  return{0:c0,1:c1,total};
 }
 
 // ── MAX POSSIBLE POINTS ──
