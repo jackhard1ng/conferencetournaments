@@ -128,7 +128,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--tx);min-he
   <button onclick="join()">Join / Load</button>
   <span class="st" id="st"></span>
 </div>
-<div style="text-align:center;padding:0 1rem .3rem;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;color:var(--dm);letter-spacing:.06em;font-style:italic;">Shoutout to Sac for picking all 1 seeds!</div>
+<div style="text-align:center;padding:0 1rem .3rem;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;color:var(--dm);letter-spacing:.06em;font-style:italic;">Venmo @jackharding17 if you are enjoying this website</div>
 <div class="vbar" id="vbar">
   <label>Viewing:</label>
   <select id="vsel" onchange="swV()"></select>
@@ -151,11 +151,11 @@ const isAdmin = new URLSearchParams(window.location.search).get("admin") === ADM
 // ── LOCK TIMES (Central Time = UTC-6 in March before DST, but DST starts Mar 8 2026 so CT = UTC-5) ──
 // DST 2026 starts Sun March 8, so by March 10 we are CDT = UTC-5
 const LK={
-  acc:    new Date("2026-03-10T13:00:00-05:00"), // 1:00 PM CT
-  big12:  new Date("2026-03-10T11:30:00-05:00"), // 11:30 AM CT
-  bigten: new Date("2026-03-10T16:00:00-05:00"), // 4:00 PM CT (first game 4pm CT)
-  bigeast:new Date("2026-03-11T15:00:00-05:00"), // 3:00 PM CT
-  sec:    new Date("2026-03-11T11:30:00-05:00"), // 11:30 AM CT
+  acc:    new Date("2026-03-10T13:00:00-06:00"), // 1:00 PM CT
+  big12:  new Date("2026-03-10T11:30:00-06:00"), // 11:30 AM CT
+  bigten: new Date("2026-03-10T16:00:00-06:00"), // 4:00 PM CT (first game 4pm CT)
+  bigeast:new Date("2026-03-11T15:00:00-06:00"), // 3:00 PM CT
+  sec:    new Date("2026-03-11T11:30:00-06:00"), // 11:30 AM CT
 };
 const lkd=ck=>Date.now()>=LK[ck].getTime();
 const anyLkd=()=>Object.keys(LK).some(lkd);
@@ -374,23 +374,33 @@ function rBrk(ck){
 
 function sl(gid,i,tm,pk,rdy,lk,rr){
   const emp=!tm,isPk=pk===i,hasR=rr!=null;
+  // Check if this pick's team has been eliminated in an earlier round
+  let eliminated=false;
+  if(isPk&&!hasR&&!emp&&tm){
+    const g=G[gid];
+    if(g&&!isStillAlive(tm.nm,g))eliminated=true;
+  }
   let cls="ts";
   if(emp)cls+=" emp";
   if(lk||!rdy)cls+=" lk";
   if(isPk&&hasR)cls+=rr===i?" ok":" no";
+  else if(isPk&&eliminated)cls+=" no";
   else if(isPk)cls+=" pk";
   const oc=(!emp&&rdy&&!lk)?` onclick="mp('${gid}',${i})"`:""
   let badge="";
   if(isPk&&hasR)badge=rr===i?`<span class="badge w">\u2713</span>`:`<span class="badge l">\u2717</span>`;
+  else if(isPk&&eliminated)badge=`<span class="badge l">\u2717</span>`;
   // Pick count — only show after conference is locked
   let pcnt="";
-  const g=G[gid];
-  if(g&&lkd(g.ck)&&!emp&&tm){
+  const g2=G[gid];
+  if(g2&&lkd(g2.ck)&&!emp&&tm){
     const counts=getPickCounts(gid,tm.nm);
     if(counts.total>0){
       if(hasR){
         const cls2=rr===i?"correct":"wrong";
         pcnt=`<span class="pcnt ${cls2}">${counts.picked}/${counts.total}</span>`;
+      }else if(eliminated){
+        pcnt=`<span class="pcnt wrong">${counts.picked}/${counts.total}</span>`;
       }else{
         pcnt=`<span class="pcnt">${counts.picked}/${counts.total}</span>`;
       }
